@@ -22,13 +22,18 @@ io.on("connection", (socket) => {
   socket.on("send_message", (data) => {
     console.log("Message received:", data);
     // Kirim pesan ke semua client
-    io.emit("receive_message", "hello World");
+    io.emit("receive_message", "d");
   });
+
+  io.emit("receive_message", "d");
+  
+  
 
   setInterval(() => {
     // Kirim pesan ke semua client
     io.emit("receive_message", "d");
-  }, 1000);
+  }, 500);
+
 
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);

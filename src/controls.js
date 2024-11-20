@@ -1,3 +1,5 @@
+import io from "socket.io-client";
+
 function easeOutQuad(x) {
   return 1 - (1 - x) * (1 - x);
 }
@@ -17,7 +19,27 @@ let pitchVelocity = 0;
 let planeSpeed = 0.006;
 export let turbo = 0;
 
+
+
+// Initialize Socket.IO connection
+const socket = io("http://localhost:4000");
+// Array to store messages
+let messages = "";
+
+
+socket.on("receive_message", (data) => {
+  if (data){
+    console.log(data); // Log the received message
+  } 
+  messages = data; // Add the message to the messages array
+});
+
+window.addEventListener("beforeunload", () => {
+  socket.disconnect();
+});
+
 export function updatePlaneAxis(x, y, z, planePosition, camera) {
+
   jawVelocity *= 0.95;
   pitchVelocity *= 0.95;
 
@@ -27,19 +49,19 @@ export function updatePlaneAxis(x, y, z, planePosition, camera) {
   if (Math.abs(pitchVelocity) > maxVelocity) 
     pitchVelocity = Math.sign(pitchVelocity) * maxVelocity;
 
-  if (controls["a"]) {
+  if (controls["a"] || messages == "a") {
     jawVelocity += 0.0025;
   }
 
-  if (controls["d"]) {
+  if (controls["d"] || messages == "d") {
     jawVelocity -= 0.0025;
   }
 
-  if (controls["w"]) {
+  if (controls["w"] || messages == "w") {
     pitchVelocity -= 0.0025;
   }
 
-  if (controls["s"]) {
+  if (controls["s"] || messages == "s") {
     pitchVelocity += 0.0025;
   }
 
@@ -78,4 +100,5 @@ export function updatePlaneAxis(x, y, z, planePosition, camera) {
   camera.updateProjectionMatrix();
 
   planePosition.add(z.clone().multiplyScalar(-planeSpeed -turboSpeed));
+  messages=""
 }
